@@ -69,7 +69,7 @@ Useful links:
 Authors:
 \itemize{
   \item Achmad Syahrul Choir \email{madsyair@stis.ac.id}
-  \item Mety Agustini \email{mety.agustini@bps.go.id} [copyright holder]
+  \item Mety Agustini \email{mety.agustini@bps.go.id}
   \item Kartika Fithriasari \email{kartika_f@its.ac.id}
   \item Dedy Dwi Prastyo \email{dedy.prastyo@its.ac.id}
 }
