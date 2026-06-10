@@ -1,4 +1,4 @@
-# accuracylevel
+# accuracylevel <img src="man/figures/logo.png" align="right" height="139" alt="accuracylevel logo" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/madsyair/accuracylevel/workflows/R-CMD-check/badge.svg)](https://github.com/madsyair/accuracylevel/actions)

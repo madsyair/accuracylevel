@@ -1,77 +1,85 @@
-url: https://madsyair.github.io/accuracylevel/
+url: https://madsyair.github.io/accuracylevel
+
 template:
   bootstrap: 5
   bslib:
-    primary: '#2C6E91'
+    primary: "#2C6E91"
+
 home:
   title: Robust Accuracy-Level Metrics for Predictive Model Evaluation
-  description: |
-    Counted Squared Error (CSE), Counted Absolute Error (CAE), Counted Absolute Percentage Error (CAPE), and Symmetric Counted Absolute Percentage Error (SCAPE) on a 0-100% scale, after Agustini, Fithriasari and Prastyo (2026).
+  description: >
+    Counted Squared Error (CSE), Counted Absolute Error (CAE), Counted
+    Absolute Percentage Error (CAPE), and Symmetric Counted Absolute
+    Percentage Error (SCAPE) on a 0-100% scale, after Agustini, Fithriasari
+    and Prastyo (2026).
+
 navbar:
   structure:
-    left:
-    - intro
-    - reference
-    - articles
-    - news
-    right:
-    - search
-    - github
+    left:  [intro, reference, articles, news]
+    right: [search, github]
   components:
     articles:
       text: Articles
       menu:
-      - text: Replicating Agustini et al. (2026)
-        href: articles/replication.html
-reference:
-- title: Core accuracy-level metrics
-  desc: Compute the four accuracy-level metrics and inspect the result.
-  contents:
-  - accuracy_level
-  - cse
-  - cae
-  - cape
-  - scape
-  - get_all_levels
-- title: Error thresholds
-  desc: Build and inspect the baseline error thresholds.
-  contents:
-  - calculate_threshold
-  - auto_threshold
-  - print.al_threshold
-- title: Error types
-  desc: Per-observation error functions used by the metrics.
-  contents:
-  - squared_error
-  - absolute_error
-  - absolute_percentage_error
-  - symmetric_absolute_percentage_error
-- title: Model comparison and benchmarks
-  desc: Compare models and contrast with conventional and robust metrics.
-  contents:
-  - compare_models
-  - compare_all_metrics
-  - conventional_metrics
-  - robust_metrics
-- title: caret integration
-  contents:
-  - caret_summary
-  - caret_summary_extended
-  - caret_single_metric
-- title: tidymodels / yardstick integration
-  contents:
-  - accuracy_level_metrics
-  - al_metric_set
-  - cse_l1
-  - cae_l1
-  - cape_l1
-  - scape_l1
-- title: forecast integration
-  contents:
-  - al_forecast_accuracy
-  - al_compare_forecasts
-  - al_extended_accuracy
-  - al_tsCV
-- title: Package
-  contents: accuracylevel-package
+        - text: "Replicating Agustini et al. (2026)"
+          href: articles/replication.html
 
+reference:
+  - title: Core accuracy-level metrics
+    desc: Compute the four accuracy-level metrics and inspect the result.
+    contents:
+      - accuracy_level
+      - cse
+      - cae
+      - cape
+      - scape
+      - get_all_levels
+
+  - title: Error thresholds
+    desc: Build and inspect the baseline error thresholds.
+    contents:
+      - calculate_threshold
+      - auto_threshold
+      - print.al_threshold
+
+  - title: Error types
+    desc: Per-observation error functions used by the metrics.
+    contents:
+      - squared_error
+      - absolute_error
+      - absolute_percentage_error
+      - symmetric_absolute_percentage_error
+
+  - title: Model comparison and benchmarks
+    desc: Compare models and contrast with conventional and robust metrics.
+    contents:
+      - compare_models
+      - compare_all_metrics
+      - conventional_metrics
+      - robust_metrics
+
+  - title: caret integration
+    contents:
+      - caret_summary
+      - caret_summary_extended
+      - caret_single_metric
+
+  - title: tidymodels / yardstick integration
+    contents:
+      - accuracy_level_metrics
+      - al_metric_set
+      - cse_l1
+      - cae_l1
+      - cape_l1
+      - scape_l1
+
+  - title: forecast integration
+    contents:
+      - al_forecast_accuracy
+      - al_compare_forecasts
+      - al_extended_accuracy
+      - al_tsCV
+
+  - title: Package
+    contents:
+      - accuracylevel-package
