@@ -6,9 +6,9 @@ Authors@R: c(
     role = c("cre", "aut")),
     person("Mety", "Agustini", email = "mety.assahid@bps.go.id",
     role = "aut"),
-    person("Kartika", "Fithriasari", email = "kartika_f@its.ac.id",
+    person("Kartika", "Fithriasari", email = "kartika_f@statistika.its.ac.id",
     role = "aut"),
-    person("Dedy Dwi", "Prastyo", email = "dd.prastyo@its.ac.id",
+    person("Dedy Dwi", "Prastyo", email = "dedy-dp@statistika.its.ac.id",
     role = "aut"))
 Author: Achmad Syahrul Choir [cre, aut],
   Mety Agustini [aut],
