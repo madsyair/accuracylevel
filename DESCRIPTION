@@ -24,6 +24,7 @@ Description: Implements novel accuracy-level metrics for evaluating continuous
     MAPE. The package integrates with 'caret', 'tidymodels', and common
     forecasting frameworks. Based on Agustini, Fithriasari, and Prastyo (2026)
     <doi:10.1016/j.dajour.2025.100661>.
+Language: en-US
 License: GPL-3
 Encoding: UTF-8
 URL: https://github.com/madsyair/accuracylevel
