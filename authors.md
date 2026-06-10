@@ -4,11 +4,11 @@
 
 - **Achmad Syahrul Choir**. Maintainer, author.
 
-- **Mety Agustini**. Author, copyright holder.
+- **Mety Agustini**. Author.
 
-- **Kartika Fithriasari**. Author, copyright holder.
+- **Kartika Fithriasari**. Author.
 
-- **Dedy Dwi Prastyo**. Author, copyright holder.
+- **Dedy Dwi Prastyo**. Author.
 
 ## Citation
 
