@@ -81,7 +81,7 @@ Authors:
 
 - Achmad Syahrul Choir <madsyair@stis.ac.id>
 
-- Mety Agustini <mety.agustini@bps.go.id> \[copyright holder\]
+- Mety Agustini <mety.agustini@bps.go.id>
 
 - Kartika Fithriasari <kartika_f@its.ac.id>
 
