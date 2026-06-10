@@ -1,0 +1,14 @@
+^accuracylevel\.Rproj$
+^\.Rproj\.user$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^codecov\.yml$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
+^\.Rbuildignore$
+^RENCANA_PERBAIKAN.*\.md$
+^example\.Rmd$
+^LICENSE\.md$
+^README\.Rmd$

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Replicating Agustini et al. (2026) with accuracylevel</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Replicating Agustini et al. (2026) with
+accuracylevel</h1>
+
+
+
+<p>This vignette reproduces the main results of</p>
+<blockquote>
+<p>Agustini, M., Fithriasari, K., &amp; Prastyo, D.D. (2026). An
+accuracy-level method for robust evaluation in predictive analytics.
+<em>Decision Analytics Journal</em>, 18, 100661. <a href="doi:10.1016/j.dajour.2025.100661" class="uri">doi:10.1016/j.dajour.2025.100661</a></p>
+</blockquote>
+<p>It covers the <strong>simple case</strong> (Table 4–6), the
+<strong>regression-with-outliers</strong> simulation, and the
+<strong>time-series</strong> case, plus the integration helpers for
+<code>caret</code>, <code>tidymodels</code>, and <code>forecast</code>.
+The <strong>imputation</strong> case study is intentionally omitted: it
+relies on confidential firm-level microdata from BPS-Statistics
+Indonesia that cannot be redistributed.</p>
+<div id="a-note-on-data" class="section level2">
+<h2>A note on data</h2>
+<p>The package ships <strong>no datasets</strong>. The article’s data
+come from public sources that are referenced by link only:</p>
+<ul>
+<li>simple linear regression and candy-production series on Kaggle (the
+candy series originates from FRED series <code>IPG3113N</code>, public
+domain);</li>
+<li>firm turnover microdata from BPS-Statistics Indonesia (confidential,
+not redistributable).</li>
+</ul>
+<p>To keep this vignette fully reproducible and free of downloads, the
+regression and time-series sections below use <strong>small simulated
+datasets generated inline</strong> with a fixed seed. Code for
+downloading the real public series is shown but not executed.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(accuracylevel)</span></code></pre></div>
+</div>
+<div id="simple-case-table-46" class="section level1">
+<h1>1. Simple case (Table 4–6)</h1>
+<p>The ten observations of Table 4 are reproduced exactly. Model 1 is
+the baseline and the threshold uses the second quartile (Q2) of the
+error, where the APE is closest to 0.10.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>actual <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">7.00</span>, <span class="fl">6.03</span>, <span class="fl">2.02</span>, <span class="fl">5.10</span>, <span class="fl">9.00</span>, <span class="fl">1.00</span>, <span class="fl">3.00</span>, <span class="fl">4.38</span>, <span class="fl">1.00</span>, <span class="fl">8.07</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">6.05</span>, <span class="fl">5.02</span>, <span class="fl">1.32</span>, <span class="fl">5.15</span>, <span class="fl">8.00</span>, <span class="fl">2.20</span>, <span class="fl">2.70</span>, <span class="fl">3.48</span>, <span class="fl">1.00</span>, <span class="fl">7.56</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">8.10</span>, <span class="fl">7.04</span>, <span class="fl">2.12</span>, <span class="fl">5.20</span>, <span class="fl">9.10</span>, <span class="fl">1.00</span>, <span class="fl">3.08</span>, <span class="fl">4.40</span>, <span class="fl">1.00</span>, <span class="fl">6.15</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>model3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">7.01</span>, <span class="fl">6.04</span>, <span class="fl">2.09</span>, <span class="fl">5.11</span>, <span class="fl">9.01</span>, <span class="fl">5.10</span>, <span class="fl">3.01</span>, <span class="fl">4.39</span>, <span class="fl">1.00</span>, <span class="fl">8.10</span>)</span></code></pre></div>
+<div id="conventional-and-robust-metrics-table-5" class="section level3">
+<h3>Conventional and robust metrics (Table 5)</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>conv <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">Model1 =</span> <span class="fu">conventional_metrics</span>(actual, model1),</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">Model2 =</span> <span class="fu">conventional_metrics</span>(actual, model2),</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">Model3 =</span> <span class="fu">conventional_metrics</span>(actual, model3)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">round</span>(conv, <span class="dv">4</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;        R_squared   RMSE  NRMSE   MAE    MAPE   SMAPE</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; Model1    0.9194 0.7756 0.1664 0.662 23.3934 20.2449</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; Model2    0.9202 0.7716 0.1656 0.443  6.7401  6.7994</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; Model3    0.7746 1.2968 0.2783 0.426 41.5015 13.9380</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>rob <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="at">Model1 =</span> <span class="fu">robust_metrics</span>(actual, model1),</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="at">Model2 =</span> <span class="fu">robust_metrics</span>(actual, model2),</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="at">Model3 =</span> <span class="fu">robust_metrics</span>(actual, model3)</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="fu">round</span>(rob, <span class="dv">4</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;        MedAE   TMSE Huber_Loss Quantile_Loss</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Model1  0.80 0.5719     0.2988        0.3310</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; Model2  0.10 0.2834     0.2548        0.2215</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; Model3  0.01 0.0008     0.3603        0.2130</span></span></code></pre></div>
+</div>
+<div id="accuracy-level-metrics-table-6" class="section level3">
+<h3>Accuracy-level metrics (Table 6)</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>thresh <span class="ot">&lt;-</span> <span class="fu">calculate_threshold</span>(actual, model1, <span class="at">error_type =</span> <span class="st">&quot;ape&quot;</span>, <span class="at">quartile =</span> <span class="dv">2</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>thresh</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; Accuracy-Level Threshold</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; ========================</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; Error type: ape </span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; Quartile: Q2</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Base threshold (T): 0.1111 </span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; Multipliers: 2, 5 </span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; Level Boundaries (ape):</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;   L1: error &lt; 0.1111 </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;   L2: 0.1111 &lt;= error &lt; 0.2222 </span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;   L3: 0.2222 &lt;= error &lt; 0.5556 </span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;   L4: error &gt;= 0.5556 </span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; Baseline Q2 for all error types:</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt;   SE:   0.49 </span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt;   AE:   0.7 </span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;   APE:  0.1111 </span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;   sAPE: 0.1176</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>al1 <span class="ot">&lt;-</span> <span class="fu">accuracy_level</span>(actual, model1, <span class="at">threshold =</span> thresh)</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>al2 <span class="ot">&lt;-</span> <span class="fu">accuracy_level</span>(actual, model2, <span class="at">threshold =</span> thresh)</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>al3 <span class="ot">&lt;-</span> <span class="fu">accuracy_level</span>(actual, model3, <span class="at">threshold =</span> thresh)</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>al1<span class="sc">$</span>metrics</span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;   Level CSE CAE CAPE SCAPE</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; 1    L1  40  40   40    40</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; 2    L2  30  60   40    40</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; 3    L3  30   0   10    10</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; 4    L4   0   0   10    10</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>al2<span class="sc">$</span>metrics</span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a><span class="co">#&gt;   Level CSE CAE CAPE SCAPE</span></span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="co">#&gt; 1    L1  70  70   70    70</span></span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="co">#&gt; 2    L2   0  20   20    20</span></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="co">#&gt; 3    L3  20  10   10    10</span></span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="co">#&gt; 4    L4  10   0    0     0</span></span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>al3<span class="sc">$</span>metrics</span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a><span class="co">#&gt;   Level CSE CAE CAPE SCAPE</span></span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a><span class="co">#&gt; 1    L1  90  90   90    90</span></span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a><span class="co">#&gt; 2    L2   0   0    0     0</span></span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a><span class="co">#&gt; 3    L3   0   0    0     0</span></span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a><span class="co">#&gt; 4    L4  10  10   10    10</span></span></code></pre></div>
+<p>These match Table 6 of the paper exactly: Model 3 reaches 90% at
+Level 1 for every metric, while conventional metrics favour Model 2.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">compare_models</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">Model1 =</span> <span class="fu">list</span>(<span class="at">actual =</span> actual, <span class="at">predicted =</span> model1),</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">Model2 =</span> <span class="fu">list</span>(<span class="at">actual =</span> actual, <span class="at">predicted =</span> model2),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">Model3 =</span> <span class="fu">list</span>(<span class="at">actual =</span> actual, <span class="at">predicted =</span> model3),</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;cape&quot;</span>, <span class="at">threshold =</span> thresh</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>res<span class="sc">$</span>optimal_model</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Model3&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>res<span class="sc">$</span>comparison[, <span class="fu">c</span>(<span class="st">&quot;Model&quot;</span>, <span class="st">&quot;L1&quot;</span>, <span class="st">&quot;L2&quot;</span>, <span class="st">&quot;L3&quot;</span>, <span class="st">&quot;L4&quot;</span>)]</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt;    Model L1 L2 L3 L4</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 1 Model1 40 40 10 10</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; 2 Model2 70 20 10  0</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 3 Model3 90  0  0 10</span></span></code></pre></div>
+</div>
+</div>
+<div id="regression-with-outliers" class="section level1">
+<h1>2. Regression with outliers</h1>
+<p>The article injects outliers into a clean regression and shows that
+the proposed metrics degrade gradually, unlike RMSE/MAPE. Here we mimic
+that with a small simulated dataset.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="dv">0</span>, <span class="dv">100</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fl">1.5</span> <span class="sc">*</span> x <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">3</span>)            <span class="co"># clean response</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>pred_clean <span class="ot">&lt;-</span> <span class="fl">1.5</span> <span class="sc">*</span> x                    <span class="co"># model prediction</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># 5% outliers injected into the response</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>y_out <span class="ot">&lt;-</span> y</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(n, <span class="at">size =</span> <span class="fl">0.05</span> <span class="sc">*</span> n)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>y_out[idx] <span class="ot">&lt;-</span> y_out[idx] <span class="sc">+</span> <span class="dv">80</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> <span class="fu">calculate_threshold</span>(y, pred_clean, <span class="at">error_type =</span> <span class="st">&quot;ape&quot;</span>, <span class="at">quartile =</span> <span class="dv">3</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>clean <span class="ot">&lt;-</span> <span class="fu">conventional_metrics</span>(y, pred_clean)</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>dirty <span class="ot">&lt;-</span> <span class="fu">conventional_metrics</span>(y_out, pred_clean)</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">clean =</span> <span class="fu">round</span>(clean, <span class="dv">3</span>), <span class="at">with_outliers =</span> <span class="fu">round</span>(dirty, <span class="dv">3</span>))</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt;               R_squared  RMSE NRMSE   MAE   MAPE  SMAPE</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; clean             0.996  2.77 0.040 2.220 11.495 10.756</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; with_outliers     0.853 17.99 0.248 6.078 14.044 14.654</span></span></code></pre></div>
+<p>Conventional metrics (especially MAPE/RMSE) jump sharply. The
+proposed Level-1 accuracy, evaluated against a fixed baseline threshold,
+moves far less:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>al_clean <span class="ot">&lt;-</span> <span class="fu">accuracy_level</span>(y,     pred_clean, <span class="at">threshold =</span> baseline)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>al_dirty <span class="ot">&lt;-</span> <span class="fu">accuracy_level</span>(y_out, pred_clean, <span class="at">threshold =</span> baseline)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">scenario =</span> <span class="fu">c</span>(<span class="st">&quot;clean&quot;</span>, <span class="st">&quot;with_outliers&quot;</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">CSE_L1   =</span> <span class="fu">c</span>(al_clean<span class="sc">$</span>metrics<span class="sc">$</span>CSE[<span class="dv">1</span>],  al_dirty<span class="sc">$</span>metrics<span class="sc">$</span>CSE[<span class="dv">1</span>]),</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="at">CAPE_L1  =</span> <span class="fu">c</span>(al_clean<span class="sc">$</span>metrics<span class="sc">$</span>CAPE[<span class="dv">1</span>], al_dirty<span class="sc">$</span>metrics<span class="sc">$</span>CAPE[<span class="dv">1</span>])</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;        scenario CSE_L1 CAPE_L1</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; 1         clean   74.5    74.5</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; 2 with_outliers   71.5    71.0</span></span></code></pre></div>
+</div>
+<div id="time-series-case" class="section level1">
+<h1>3. Time-series case</h1>
+<p>The paper forecasts U.S. candy production (FRED
+<code>IPG3113N</code>). That series is public; you could load it
+directly:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Public source (not run during vignette build):</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co"># https://www.kaggle.com/code/goldens/candy-production-time-series-analysis</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>candy <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;candy_production.csv&quot;</span>)</span></code></pre></div>
+<p>For a self-contained demonstration we simulate a seasonal series and
+compare two naive forecasts.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">48</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>trend <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">80</span>, <span class="dv">120</span>, <span class="at">length.out =</span> m)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>season <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> (<span class="dv">1</span><span class="sc">:</span>m) <span class="sc">/</span> <span class="dv">12</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>candy <span class="ot">&lt;-</span> trend <span class="sc">+</span> season <span class="sc">+</span> <span class="fu">rnorm</span>(m, <span class="dv">0</span>, <span class="dv">3</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>fc_seasonal <span class="ot">&lt;-</span> <span class="fu">c</span>(candy[<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>], candy[<span class="dv">1</span><span class="sc">:</span>(m <span class="sc">-</span> <span class="dv">12</span>)])    <span class="co"># seasonal-naive-like</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>fc_mean     <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">mean</span>(candy), m)                   <span class="co"># mean forecast</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>base_ts <span class="ot">&lt;-</span> <span class="fu">calculate_threshold</span>(candy, fc_seasonal, <span class="at">error_type =</span> <span class="st">&quot;ape&quot;</span>, <span class="at">quartile =</span> <span class="dv">2</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>  <span class="at">model   =</span> <span class="fu">c</span>(<span class="st">&quot;seasonal&quot;</span>, <span class="st">&quot;mean&quot;</span>),</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="at">CSE_L1  =</span> <span class="fu">c</span>(<span class="fu">accuracy_level</span>(candy, fc_seasonal, <span class="at">threshold =</span> base_ts)<span class="sc">$</span>metrics<span class="sc">$</span>CSE[<span class="dv">1</span>],</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>              <span class="fu">accuracy_level</span>(candy, fc_mean,     <span class="at">threshold =</span> base_ts)<span class="sc">$</span>metrics<span class="sc">$</span>CSE[<span class="dv">1</span>])</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>)</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt;      model   CSE_L1</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt; 1 seasonal 47.91667</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="co">#&gt; 2     mean 43.75000</span></span></code></pre></div>
+</div>
+<div id="framework-integration" class="section level1">
+<h1>4. Framework integration</h1>
+<p>The integration helpers require optional packages; the chunks below
+run only when those packages are installed.</p>
+<div id="caret" class="section level3">
+<h3>caret</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; Loading required package: ggplot2</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; Loading required package: lattice</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;caret&#39;</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:accuracylevel&#39;:</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt;     compare_models</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">y =</span> y, <span class="at">x =</span> x)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">3</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>                     <span class="at">summaryFunction =</span> <span class="fu">caret_summary</span>())</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">train</span>(y <span class="sc">~</span> x, <span class="at">data =</span> dat, <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>             <span class="at">trControl =</span> ctrl, <span class="at">metric =</span> <span class="st">&quot;CSE_L1&quot;</span>, <span class="at">maximize =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>fit<span class="sc">$</span>results[, <span class="fu">c</span>(<span class="st">&quot;RMSE&quot;</span>, <span class="st">&quot;CSE_L1&quot;</span>, <span class="st">&quot;CAE_L1&quot;</span>)]</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt;       RMSE   CSE_L1   CAE_L1</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="co">#&gt; 1 2.747379 74.49872 74.49872</span></span></code></pre></div>
+</div>
+<div id="tidymodels-yardstick" class="section level3">
+<h3>tidymodels / yardstick</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;yardstick&#39;</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:caret&#39;:</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt;     precision, recall, sensitivity, specificity</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">truth =</span> actual, <span class="at">estimate =</span> model3)</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="fu">accuracy_level_metrics</span>(df, truth, estimate)</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; # A tibble: 16 × 3</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt;    .metric  .estimator .estimate</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt;  1 cse_l1   standard          70</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt;  2 cse_l2   standard          10</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt;  3 cse_l3   standard           0</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt;  4 cse_l4   standard          20</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt;  5 cae_l1   standard          70</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt;  6 cae_l2   standard          10</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt;  7 cae_l3   standard          10</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt;  8 cae_l4   standard          10</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt;  9 cape_l1  standard          70</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt; 10 cape_l2  standard          10</span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="co">#&gt; 11 cape_l3  standard           0</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="co">#&gt; 12 cape_l4  standard          20</span></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a><span class="co">#&gt; 13 scape_l1 standard          70</span></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a><span class="co">#&gt; 14 scape_l2 standard          10</span></span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a><span class="co">#&gt; 15 scape_l3 standard           0</span></span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a><span class="co">#&gt; 16 scape_l4 standard          20</span></span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a>al_set <span class="ot">&lt;-</span> <span class="fu">al_metric_set</span>(<span class="at">include_traditional =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a><span class="fu">al_set</span>(df, <span class="at">truth =</span> truth, <span class="at">estimate =</span> estimate)</span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a><span class="co">#&gt; # A tibble: 7 × 3</span></span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a><span class="co">#&gt; 1 cse_l1   standard      70    </span></span>
+<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a><span class="co">#&gt; 2 cae_l1   standard      70    </span></span>
+<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a><span class="co">#&gt; 3 cape_l1  standard      70    </span></span>
+<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a><span class="co">#&gt; 4 scape_l1 standard      70    </span></span>
+<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a><span class="co">#&gt; 5 rmse     standard       1.30 </span></span>
+<span id="cb11-39"><a href="#cb11-39" tabindex="-1"></a><span class="co">#&gt; 6 mae      standard       0.426</span></span>
+<span id="cb11-40"><a href="#cb11-40" tabindex="-1"></a><span class="co">#&gt; 7 rsq      standard       0.799</span></span></code></pre></div>
+</div>
+<div id="forecast" class="section level3">
+<h3>forecast</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;forecast&#39;</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:yardstick&#39;:</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt;     accuracy</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>train_ts <span class="ot">&lt;-</span> <span class="fu">ts</span>(candy[<span class="dv">1</span><span class="sc">:</span><span class="dv">36</span>], <span class="at">frequency =</span> <span class="dv">12</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>fc <span class="ot">&lt;-</span> <span class="fu">forecast</span>(<span class="fu">ets</span>(train_ts), <span class="at">h =</span> <span class="dv">12</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="fu">al_forecast_accuracy</span>(fc, candy[<span class="dv">37</span><span class="sc">:</span><span class="dv">48</span>])<span class="sc">$</span>metrics</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt;   Level       CSE      CAE     CAPE    SCAPE</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; 1    L1 66.666667 66.66667 66.66667 66.66667</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; 2    L2 25.000000 33.33333 33.33333 33.33333</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; 3    L3  8.333333  0.00000  0.00000  0.00000</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; 4    L4  0.000000  0.00000  0.00000  0.00000</span></span></code></pre></div>
+</div>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session info</h1>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; R version 4.6.0 (2026-04-24)</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; Matrix products: default</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; locale:</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt;  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=C              </span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt;  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   </span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt;  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 </span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt;  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt; [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       </span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt; time zone: Asia/Jakarta</span></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; attached base packages:</span></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="co">#&gt; other attached packages:</span></span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a><span class="co">#&gt; [1] forecast_8.24.0     yardstick_1.3.2     caret_7.0-1        </span></span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a><span class="co">#&gt; [4] lattice_0.22-9      ggplot2_4.0.3       accuracylevel_0.1.0</span></span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a><span class="co">#&gt;   [1] pROC_1.19.0.1        rlang_1.2.0          magrittr_2.0.5      </span></span>
+<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a><span class="co">#&gt;   [4] tseries_0.10-58      furrr_0.3.1          otel_0.2.0          </span></span>
+<span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a><span class="co">#&gt;   [7] compiler_4.6.0       roxygen2_8.0.0       vctrs_0.7.3         </span></span>
+<span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a><span class="co">#&gt;  [10] reshape2_1.4.5       quadprog_1.5-8       lhs_1.2.0           </span></span>
+<span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a><span class="co">#&gt;  [13] stringr_1.6.0        tune_1.3.0           pkgconfig_2.0.3     </span></span>
+<span id="cb13-34"><a href="#cb13-34" tabindex="-1"></a><span class="co">#&gt;  [16] fastmap_1.2.0        ellipsis_0.3.3       utf8_1.2.6          </span></span>
+<span id="cb13-35"><a href="#cb13-35" tabindex="-1"></a><span class="co">#&gt;  [19] rmarkdown_2.31       prodlim_2025.04.28   sessioninfo_1.2.3   </span></span>
+<span id="cb13-36"><a href="#cb13-36" tabindex="-1"></a><span class="co">#&gt;  [22] purrr_1.2.2          xfun_0.57            cachem_1.1.0        </span></span>
+<span id="cb13-37"><a href="#cb13-37" tabindex="-1"></a><span class="co">#&gt;  [25] jsonlite_2.0.0       recipes_1.3.1        parallel_4.6.0      </span></span>
+<span id="cb13-38"><a href="#cb13-38" tabindex="-1"></a><span class="co">#&gt;  [28] R6_2.6.1             bslib_0.10.0         stringi_1.8.7       </span></span>
+<span id="cb13-39"><a href="#cb13-39" tabindex="-1"></a><span class="co">#&gt;  [31] rsample_1.3.1        RColorBrewer_1.1-3   parallelly_1.47.0   </span></span>
+<span id="cb13-40"><a href="#cb13-40" tabindex="-1"></a><span class="co">#&gt;  [34] pkgload_1.5.2        rpart_4.1.27         lmtest_0.9-40       </span></span>
+<span id="cb13-41"><a href="#cb13-41" tabindex="-1"></a><span class="co">#&gt;  [37] lubridate_1.9.4      jquerylib_0.1.4      Rcpp_1.1.1-1.1      </span></span>
+<span id="cb13-42"><a href="#cb13-42" tabindex="-1"></a><span class="co">#&gt;  [40] dials_1.4.1          iterators_1.0.14     knitr_1.51          </span></span>
+<span id="cb13-43"><a href="#cb13-43" tabindex="-1"></a><span class="co">#&gt;  [43] future.apply_1.20.2  zoo_1.8-14           usethis_3.2.1       </span></span>
+<span id="cb13-44"><a href="#cb13-44" tabindex="-1"></a><span class="co">#&gt;  [46] Matrix_1.7-5         splines_4.6.0        nnet_7.3-20         </span></span>
+<span id="cb13-45"><a href="#cb13-45" tabindex="-1"></a><span class="co">#&gt;  [49] timechange_0.4.0     tidyselect_1.2.1     rstudioapi_0.17.1   </span></span>
+<span id="cb13-46"><a href="#cb13-46" tabindex="-1"></a><span class="co">#&gt;  [52] dichromat_2.0-0.1    yaml_2.3.12          timeDate_4041.110   </span></span>
+<span id="cb13-47"><a href="#cb13-47" tabindex="-1"></a><span class="co">#&gt;  [55] codetools_0.2-20     curl_7.1.0           listenv_0.10.1      </span></span>
+<span id="cb13-48"><a href="#cb13-48" tabindex="-1"></a><span class="co">#&gt;  [58] pkgbuild_1.4.8       tibble_3.3.1         plyr_1.8.9          </span></span>
+<span id="cb13-49"><a href="#cb13-49" tabindex="-1"></a><span class="co">#&gt;  [61] quantmod_0.4.28      withr_3.0.2          S7_0.2.2            </span></span>
+<span id="cb13-50"><a href="#cb13-50" tabindex="-1"></a><span class="co">#&gt;  [64] urca_1.3-4           evaluate_1.0.5       future_1.70.0       </span></span>
+<span id="cb13-51"><a href="#cb13-51" tabindex="-1"></a><span class="co">#&gt;  [67] desc_1.4.3           survival_3.8-6       xts_0.14.1          </span></span>
+<span id="cb13-52"><a href="#cb13-52" tabindex="-1"></a><span class="co">#&gt;  [70] xml2_1.5.2           pillar_1.11.1        foreach_1.5.2       </span></span>
+<span id="cb13-53"><a href="#cb13-53" tabindex="-1"></a><span class="co">#&gt;  [73] stats4_4.6.0         TTR_0.24.4           generics_0.1.4      </span></span>
+<span id="cb13-54"><a href="#cb13-54" tabindex="-1"></a><span class="co">#&gt;  [76] rprojroot_2.1.1      commonmark_2.0.0     scales_1.4.0        </span></span>
+<span id="cb13-55"><a href="#cb13-55" tabindex="-1"></a><span class="co">#&gt;  [79] globals_0.19.1       class_7.3-23         glue_1.8.1          </span></span>
+<span id="cb13-56"><a href="#cb13-56" tabindex="-1"></a><span class="co">#&gt;  [82] tools_4.6.0          data.table_1.18.4    ModelMetrics_1.2.2.2</span></span>
+<span id="cb13-57"><a href="#cb13-57" tabindex="-1"></a><span class="co">#&gt;  [85] gower_1.0.2          fs_2.1.0             grid_4.6.0          </span></span>
+<span id="cb13-58"><a href="#cb13-58" tabindex="-1"></a><span class="co">#&gt;  [88] tidyr_1.3.2          colorspace_2.1-1     ipred_0.9-15        </span></span>
+<span id="cb13-59"><a href="#cb13-59" tabindex="-1"></a><span class="co">#&gt;  [91] devtools_2.5.2       nlme_3.1-169         fracdiff_1.5-3      </span></span>
+<span id="cb13-60"><a href="#cb13-60" tabindex="-1"></a><span class="co">#&gt;  [94] cli_3.6.6            DiceDesign_1.10      workflows_1.2.0     </span></span>
+<span id="cb13-61"><a href="#cb13-61" tabindex="-1"></a><span class="co">#&gt;  [97] parsnip_1.3.2        lava_1.8.1           dplyr_1.2.1         </span></span>
+<span id="cb13-62"><a href="#cb13-62" tabindex="-1"></a><span class="co">#&gt; [100] gtable_0.3.6         GPfit_1.0-9          sass_0.4.10         </span></span>
+<span id="cb13-63"><a href="#cb13-63" tabindex="-1"></a><span class="co">#&gt; [103] digest_0.6.39        farver_2.1.2         memoise_2.0.1       </span></span>
+<span id="cb13-64"><a href="#cb13-64" tabindex="-1"></a><span class="co">#&gt; [106] htmltools_0.5.9      lifecycle_1.0.5      hardhat_1.4.1       </span></span>
+<span id="cb13-65"><a href="#cb13-65" tabindex="-1"></a><span class="co">#&gt; [109] MASS_7.3-65</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

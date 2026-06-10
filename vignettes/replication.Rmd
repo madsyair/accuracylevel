@@ -1,0 +1,224 @@
+---
+title: "Replicating Agustini et al. (2026) with accuracylevel"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Replicating Agustini et al. (2026) with accuracylevel}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+This vignette reproduces the main results of
+
+> Agustini, M., Fithriasari, K., & Prastyo, D.D. (2026). An accuracy-level
+> method for robust evaluation in predictive analytics. *Decision Analytics
+> Journal*, 18, 100661. <doi:10.1016/j.dajour.2025.100661>
+
+It covers the **simple case** (Table 4--6), the **regression-with-outliers**
+simulation, and the **time-series** case, plus the integration helpers for
+`caret`, `tidymodels`, and `forecast`. The **imputation** case study is
+intentionally omitted: it relies on confidential firm-level microdata from
+BPS-Statistics Indonesia that cannot be redistributed.
+
+## A note on data
+
+The package ships **no datasets**. The article's data come from public
+sources that are referenced by link only:
+
+* simple linear regression and candy-production series on Kaggle
+  (the candy series originates from FRED series `IPG3113N`, public domain);
+* firm turnover microdata from BPS-Statistics Indonesia (confidential, not
+  redistributable).
+
+To keep this vignette fully reproducible and free of downloads, the
+regression and time-series sections below use **small simulated datasets
+generated inline** with a fixed seed. Code for downloading the real public
+series is shown but not executed.
+
+```{r load}
+library(accuracylevel)
+```
+
+# 1. Simple case (Table 4--6)
+
+The ten observations of Table 4 are reproduced exactly. Model 1 is the
+baseline and the threshold uses the second quartile (Q2) of the error, where
+the APE is closest to 0.10.
+
+```{r simple-data}
+actual <- c(7.00, 6.03, 2.02, 5.10, 9.00, 1.00, 3.00, 4.38, 1.00, 8.07)
+model1 <- c(6.05, 5.02, 1.32, 5.15, 8.00, 2.20, 2.70, 3.48, 1.00, 7.56)
+model2 <- c(8.10, 7.04, 2.12, 5.20, 9.10, 1.00, 3.08, 4.40, 1.00, 6.15)
+model3 <- c(7.01, 6.04, 2.09, 5.11, 9.01, 5.10, 3.01, 4.39, 1.00, 8.10)
+```
+
+### Conventional and robust metrics (Table 5)
+
+```{r simple-conv}
+conv <- rbind(
+  Model1 = conventional_metrics(actual, model1),
+  Model2 = conventional_metrics(actual, model2),
+  Model3 = conventional_metrics(actual, model3)
+)
+round(conv, 4)
+
+rob <- rbind(
+  Model1 = robust_metrics(actual, model1),
+  Model2 = robust_metrics(actual, model2),
+  Model3 = robust_metrics(actual, model3)
+)
+round(rob, 4)
+```
+
+### Accuracy-level metrics (Table 6)
+
+```{r simple-al}
+thresh <- calculate_threshold(actual, model1, error_type = "ape", quartile = 2)
+thresh
+
+al1 <- accuracy_level(actual, model1, threshold = thresh)
+al2 <- accuracy_level(actual, model2, threshold = thresh)
+al3 <- accuracy_level(actual, model3, threshold = thresh)
+
+al1$metrics
+al2$metrics
+al3$metrics
+```
+
+These match Table 6 of the paper exactly: Model 3 reaches 90% at Level 1 for
+every metric, while conventional metrics favour Model 2.
+
+```{r simple-compare}
+res <- compare_models(
+  Model1 = list(actual = actual, predicted = model1),
+  Model2 = list(actual = actual, predicted = model2),
+  Model3 = list(actual = actual, predicted = model3),
+  metric = "cape", threshold = thresh
+)
+res$optimal_model
+res$comparison[, c("Model", "L1", "L2", "L3", "L4")]
+```
+
+# 2. Regression with outliers
+
+The article injects outliers into a clean regression and shows that the
+proposed metrics degrade gradually, unlike RMSE/MAPE. Here we mimic that with
+a small simulated dataset.
+
+```{r reg-sim}
+set.seed(2026)
+n <- 200
+x <- runif(n, 0, 100)
+y <- 1.5 * x + rnorm(n, 0, 3)            # clean response
+pred_clean <- 1.5 * x                    # model prediction
+
+# 5% outliers injected into the response
+y_out <- y
+idx <- sample(n, size = 0.05 * n)
+y_out[idx] <- y_out[idx] + 80
+
+baseline <- calculate_threshold(y, pred_clean, error_type = "ape", quartile = 3)
+
+clean <- conventional_metrics(y, pred_clean)
+dirty <- conventional_metrics(y_out, pred_clean)
+rbind(clean = round(clean, 3), with_outliers = round(dirty, 3))
+```
+
+Conventional metrics (especially MAPE/RMSE) jump sharply. The proposed
+Level-1 accuracy, evaluated against a fixed baseline threshold, moves far
+less:
+
+```{r reg-al}
+al_clean <- accuracy_level(y,     pred_clean, threshold = baseline)
+al_dirty <- accuracy_level(y_out, pred_clean, threshold = baseline)
+
+data.frame(
+  scenario = c("clean", "with_outliers"),
+  CSE_L1   = c(al_clean$metrics$CSE[1],  al_dirty$metrics$CSE[1]),
+  CAPE_L1  = c(al_clean$metrics$CAPE[1], al_dirty$metrics$CAPE[1])
+)
+```
+
+# 3. Time-series case
+
+The paper forecasts U.S. candy production (FRED `IPG3113N`). That series is
+public; you could load it directly:
+
+```{r ts-download, eval = FALSE}
+# Public source (not run during vignette build):
+# https://www.kaggle.com/code/goldens/candy-production-time-series-analysis
+candy <- read.csv("candy_production.csv")
+```
+
+For a self-contained demonstration we simulate a seasonal series and compare
+two naive forecasts.
+
+```{r ts-sim}
+set.seed(1)
+m <- 48
+trend <- seq(80, 120, length.out = m)
+season <- 10 * sin(2 * pi * (1:m) / 12)
+candy <- trend + season + rnorm(m, 0, 3)
+
+fc_seasonal <- c(candy[1:12], candy[1:(m - 12)])    # seasonal-naive-like
+fc_mean     <- rep(mean(candy), m)                   # mean forecast
+
+base_ts <- calculate_threshold(candy, fc_seasonal, error_type = "ape", quartile = 2)
+
+data.frame(
+  model   = c("seasonal", "mean"),
+  CSE_L1  = c(accuracy_level(candy, fc_seasonal, threshold = base_ts)$metrics$CSE[1],
+              accuracy_level(candy, fc_mean,     threshold = base_ts)$metrics$CSE[1])
+)
+```
+
+# 4. Framework integration
+
+The integration helpers require optional packages; the chunks below run only
+when those packages are installed.
+
+### caret
+
+```{r caret, eval = requireNamespace("caret", quietly = TRUE)}
+library(caret)
+dat <- data.frame(y = y, x = x)
+ctrl <- trainControl(method = "cv", number = 3,
+                     summaryFunction = caret_summary())
+fit <- train(y ~ x, data = dat, method = "lm",
+             trControl = ctrl, metric = "CSE_L1", maximize = TRUE)
+fit$results[, c("RMSE", "CSE_L1", "CAE_L1")]
+```
+
+### tidymodels / yardstick
+
+```{r yardstick, eval = requireNamespace("yardstick", quietly = TRUE)}
+library(yardstick)
+df <- data.frame(truth = actual, estimate = model3)
+accuracy_level_metrics(df, truth, estimate)
+
+al_set <- al_metric_set(include_traditional = TRUE)
+al_set(df, truth = truth, estimate = estimate)
+```
+
+### forecast
+
+```{r forecast, eval = requireNamespace("forecast", quietly = TRUE)}
+library(forecast)
+train_ts <- ts(candy[1:36], frequency = 12)
+fc <- forecast(ets(train_ts), h = 12)
+al_forecast_accuracy(fc, candy[37:48])$metrics
+```
+
+# Session info
+
+```{r session}
+sessionInfo()
+```
