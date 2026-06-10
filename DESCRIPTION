@@ -5,11 +5,11 @@ Authors@R: c(
     person("Achmad Syahrul", "Choir", email = "madsyair@stis.ac.id",
     role = c("cre", "aut")),
     person("Mety", "Agustini", email = "mety.agustini@bps.go.id",
-    role = c("aut", "cph")),
+    role = "aut"),
     person("Kartika", "Fithriasari", email = "kartika_f@its.ac.id",
-    role = c("aut", "cph")),
-    person("Dedy Dwi", "Prastyo", email = "dedy.prastyo@its.ac.id",
-    role = c("aut", "cph")))
+    role = "aut"),
+    person("Dedy Dwi", "Prastyo", email = "dd.prastyo@its.ac.id",
+    role = "aut"))
 Description: Implements novel accuracy-level metrics for evaluating continuous
     data prediction models. Four metrics are provided: Counted Squared Error
     (CSE), Counted Absolute Error (CAE), Counted Absolute Percentage Error
